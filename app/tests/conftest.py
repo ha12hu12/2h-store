@@ -74,3 +74,28 @@ def create_test_user1(session):
     assert utils.verify_password(plain_password=data1['password'], 
                                  hashed_password=the_new_user.password)  == True
     return new_user
+
+
+data2 = {
+    "username": "ha12hu12_tester2",
+    "password": "ha12hu12"
+}
+
+@pytest.fixture
+def create_test_user2(session):
+    new_user = models.User(**data2)
+    new_user.password = utils.hash_password(password=new_user.password)
+    session.add(new_user)
+    session.commit()
+    session.refresh(new_user)
+    return new_user
+
+
+@pytest.fixture
+def test_products(session, create_test_user1, create_test_user2):
+    session.add_all([
+        models.product(product_name="Wireless Mouse", description="Comfortable mouse", amount=25, price=50.0, owner_id=create_test_user1.id),
+        models.product(product_name="Keyboard", description="Mechanical keyboard", amount=10, price=120.0, owner_id=create_test_user2.id),
+    ])
+    session.commit()
+    return session.query(models.product).all()

@@ -21,7 +21,7 @@ def login(data:UserLogin, db:session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"there is no user with {data.username} username")
     #check if the password is correct
     if not utils.verify_password(plain_password=data.password, hashed_password=the_user.password):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Incorrect password please try again")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Could not validate credentials")
 
     access_token = create_access_token(payload={"id": the_user.id})
     return {"access_token": access_token, "token_type": "bearer"}

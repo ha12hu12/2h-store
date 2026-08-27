@@ -1,5 +1,5 @@
 from .database import Base
-from sqlalchemy import Column, Integer, String, VARCHAR,Boolean, TIMESTAMP, text, ForeignKey
+from sqlalchemy import Column, Integer, String, VARCHAR, Float, TIMESTAMP, text, ForeignKey
 from sqlalchemy.orm import relationship
 
 class User(Base):
@@ -8,6 +8,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     username = Column(VARCHAR(50), nullable=False, unique=True)
     password = Column(String, nullable=False)
+    cash = Column(Float, server_default=text("0.0"), nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, 
                         server_default=text("now()"))
 
@@ -19,7 +20,8 @@ class product(Base):
     product_name = Column(VARCHAR(length=100), nullable=False)
     description = Column(VARCHAR(1000), server_default="No description")
     amount = Column(Integer, nullable=False)
-    image_url = Column(String, nullable=True)
+    price = Column(Float, nullable=False)
+    image_url = Column(String, server_default=None)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, 
                         server_default=text("now()"))
     owner_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), 
