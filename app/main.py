@@ -1,4 +1,4 @@
-from app.routers import user, auth, product
+from app.routers import user, auth, product, cart
 
 from fastapi import  FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,3 +22,4 @@ def root():
 twoH.include_router(user.router)
 twoH.include_router(auth.router)
 twoH.include_router(product.router)
+twoH.include_router(cart.router)

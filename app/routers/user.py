@@ -51,6 +51,16 @@ def update_password(updated_password: schemas.UserUpdatePassword , db: session =
     db.commit()
     return {"message": "successfully changed password"}
 
+  #update cash
+@router.put("/users/money", status_code=status.HTTP_201_CREATED)
+def update_user_money(updated_money: schemas.UserUpdateMoney , db: session = Depends(get_db), current_user = Depends(get_current_user)):
+    the_user = db.query(models.User).filter(models.User.id == current_user.id)
+    the_user.update(updated_money.model_dump(), synchronize_session = False)
+    db.commit()
+    return {"message": "money updated successfully", 
+            "new_money": updated_money}
+
+
 
 #delete user
 @router.delete("/users")

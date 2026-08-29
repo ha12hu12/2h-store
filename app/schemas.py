@@ -1,6 +1,8 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from typing import Optional
+
+
 #--------user schemas--------#
 class UserCreate(BaseModel):
     username: str
@@ -8,10 +10,14 @@ class UserCreate(BaseModel):
 class UserOut(BaseModel):
     id: int
     username: str
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
+
 class UserUpdateUsername(BaseModel):
     username:str
+
+class UserUpdateMoney(BaseModel):
+    money: int
+
 class UserUpdatePassword(BaseModel):
     current_password:str
     new_password:str
@@ -53,3 +59,19 @@ class ProductUpdate(BaseModel):
     description: Optional[str] = None
     amount: Optional[int] = None
     price: Optional[float] = None   
+
+#--------cart schemas--------#
+class ChangePaid(BaseModel):
+    cart_id: int
+    status: bool
+
+class CartOutPurchases(BaseModel):
+    id: int
+    product: ProductOut
+    status: bool
+
+class CartOutDebts(BaseModel):
+    id: int
+    buyer: UserOut
+    product: ProductOut
+    status: bool

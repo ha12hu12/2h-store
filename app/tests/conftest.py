@@ -99,3 +99,29 @@ def test_products(session, create_test_user1, create_test_user2):
     ])
     session.commit()
     return session.query(models.product).all()
+
+@pytest.fixture
+def create_test_product(session, create_test_user2):
+    new_product = models.product(
+        product_name="Test Product",
+        description="A test product",
+        amount=5,
+        price=50.0,
+        owner_id=create_test_user2.id
+    )
+    session.add(new_product)
+    session.commit()
+    session.refresh(new_product)
+    return new_product
+
+@pytest.fixture
+def create_test_cart(session, create_test_user1, create_test_user2, test_products):
+    product = next(p for p in test_products if p.owner_id == create_test_user2.id)
+    new_cart = models.Cart(
+        user_id=create_test_user1.id,
+        product_id=product.id
+    )
+    session.add(new_cart)
+    session.commit()
+    session.refresh(new_cart)
+    return new_cart

@@ -1,5 +1,5 @@
 from .database import Base
-from sqlalchemy import Column, Integer, String, VARCHAR, Float, TIMESTAMP, text, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, VARCHAR, Float, TIMESTAMP, text, ForeignKey
 from sqlalchemy.orm import relationship
 
 class User(Base):
@@ -8,7 +8,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     username = Column(VARCHAR(50), nullable=False, unique=True)
     password = Column(String, nullable=False)
-    cash = Column(Float, server_default=text("0.0"), nullable=False)
+    money = Column(Float, server_default=text("0.0"), nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, 
                         server_default=text("now()"))
 
@@ -29,10 +29,20 @@ class product(Base):
 
     owner = relationship("User")
 
-class cart(Base):
+from sqlalchemy import UniqueConstraint
+
+class Cart(Base):
     __tablename__ = "cart"
 
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), 
-                     primary_key=True)
-    post_id = Column(Integer, ForeignKey("products.id", ondelete="CASCADE"), 
-                     primary_key=True)
+    id = Column(Integer, primary_key=True, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    product_id = Column(Integer, ForeignKey("products.id", ondelete="CASCADE"), nullable=False)
+    status = Column(Boolean, server_default=text("False"), nullable=False)
+
+    buyer = relationship("User")
+    product = relationship("product")
+    __table_args__ = (
+        UniqueConstraint('user_id', 'product_id', name='unique_user_product'),
+    )
+
+
