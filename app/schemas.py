@@ -10,6 +10,7 @@ class UserCreate(BaseModel):
 class UserOut(BaseModel):
     id: int
     username: str
+    money: float
     model_config = ConfigDict(from_attributes=True)
 
 class UserUpdateUsername(BaseModel):
@@ -36,10 +37,11 @@ class ProductCreate(BaseModel):
     product_name: str
     description: Optional[str] = "there is no description"
     amount: int
-    price: int
-    image_url: Optional[str] = "there is no images"
+    price: float
+    image_url: Optional[str] = None
 
 class ProductOut(BaseModel):
+    id: int
     product_name: str
     description: str
     amount: int
@@ -48,9 +50,11 @@ class ProductOut(BaseModel):
     owner: UserOut
     
 class MyProductOut(BaseModel):
+    id: int
     product_name: str
     description: Optional[str] = "there is no description"
     amount: int
+    price: float
     image_url: Optional[str] = None
 
 
@@ -58,7 +62,8 @@ class ProductUpdate(BaseModel):
     product_name: Optional[str] = None
     description: Optional[str] = None
     amount: Optional[int] = None
-    price: Optional[float] = None   
+    price: Optional[float] = None 
+    image_url: Optional[str] = None  
 
 #--------cart schemas--------#
 class ChangePaid(BaseModel):
