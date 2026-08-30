@@ -96,7 +96,8 @@ def change_paid_product(data: schemas.ChangePaid, db: session = Depends(get_db),
     #check if the user altering "paid" is the product owner
     if current_user.id != the_product.owner_id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"user: {current_user.username} is not allowed to alter paid")
-
+    #give the owner his bucks🤑
+    current_user.money += the_product.price
     #delete the product  from cart
     if data.status == True:
         cart_product_query.delete(synchronize_session=False)
