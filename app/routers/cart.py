@@ -118,6 +118,7 @@ def delete_cart(id: int, db: session = Depends(get_db), current_user = Depends(g
     if cart_query.first().user_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"user: {current_user.id} cant change: {cart_query.first().user_id}")
     the_product.amount += 1
+    current_user.money += the_product.price
     cart_query.delete(synchronize_session=False)
     db.commit()
     return {"message": "deleted successfully"}

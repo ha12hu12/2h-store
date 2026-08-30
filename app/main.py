@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 twoH = FastAPI()
 
-origins = [ "https://2h-store-frontend.vercel.app"]
+origins = ["http://localhost:5173", "https://2h-store-frontend.vercel.app"]
 
 twoH.add_middleware(
     CORSMiddleware,
