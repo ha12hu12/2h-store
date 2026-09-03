@@ -26,6 +26,14 @@ def create_user(data: schemas.UserCreate, db: session = Depends(get_db)):
     db.refresh(new_user)
     return new_user
 
+#get all users
+@router.get("/users", response_model=list[schemas.UserOut])
+def get_all_users(
+    db: session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    return db.query(models.User).all()
+
 @router.get("/users/me", response_model=schemas.UserOut)
 def get_me(current_user = Depends(get_current_user)):
     return current_user
