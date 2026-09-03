@@ -23,16 +23,6 @@ def test_create_cart_product_not_found(authorized_client):
     assert res.status_code == 404
 
 
-def test_create_cart_already_exists(authorized_client, test_products, create_test_user1, create_test_user2, session):
-    product = next(p for p in test_products if p.owner_id == create_test_user2.id)
-    create_test_user1.money = 1000.0
-    session.commit()
-    res1 = authorized_client.post(f"/carts/{product.id}")
-    assert res1.status_code == 201
-    res2 = authorized_client.post(f"/carts/{product.id}")
-    assert res2.status_code == 409
-
-
 def test_create_cart_out_of_stock(authorized_client, session, create_test_user1, create_test_user2):
     product = models.product(
         product_name="Sold Out Item", description="none",
@@ -47,6 +37,91 @@ def test_create_cart_out_of_stock(authorized_client, session, create_test_user1,
     session.commit()
     res = authorized_client.post(f"/carts/{product_id}")
     assert res.status_code == 409
+
+# ==== CREATE PLEDGEs ====
+
+def test_create_cart_pledge_success(authorized_client, session, create_test_pledge_product, create_test_user1):
+    create_test_user1.money = 30.0
+    session.commit()
+    user_id = create_test_user1.id
+
+    res = authorized_client.post(f"/carts/pledges/{create_test_pledge_product.id}")
+
+    assert res.status_code == 201
+    assert session.query(models.Cart).filter_by(product_id=create_test_pledge_product.id).count() == 1
+    assert session.query(models.User).filter_by(id=user_id).one().money == 0.0
+
+
+def test_create_cart_pledge_missing_product(authorized_client):
+    res = authorized_client.post("/carts/pledges/99999")
+    assert res.status_code == 404
+
+
+def test_create_cart_pledge_requires_pledge_product(authorized_client, create_test_product):
+    res = authorized_client.post(f"/carts/pledges/{create_test_product.id}")
+    assert res.status_code == 403
+
+
+def test_create_cart_pledge_requires_participant(client, create_test_pledge_product, create_test_user2):
+    token = create_access_token(payload={"id": create_test_user2.id})
+    client.headers = {**client.headers, "Authorization": f"Bearer {token}"}
+
+    res = client.post(f"/carts/pledges/{create_test_pledge_product.id}")
+
+    assert res.status_code == 409
+
+
+def test_create_cart_pledge_insufficient_funds(authorized_client, session, create_test_pledge_product, create_test_user1):
+    create_test_user1.money = 29.99
+    session.commit()
+
+    res = authorized_client.post(f"/carts/pledges/{create_test_pledge_product.id}")
+
+    assert res.status_code == 409
+    assert session.query(models.Cart).filter_by(product_id=create_test_pledge_product.id).count() == 0
+
+
+def test_create_cart_pledge_exact_total_and_over_limit(authorized_client, session, create_test_pledge_product, create_test_user1):
+    create_test_user1.money = 90.0
+    session.commit()
+    user1_id = create_test_user1.id
+    first_res = authorized_client.post(f"/carts/pledges/{create_test_pledge_product.id}")
+    assert first_res.status_code == 201
+
+    exact_res = authorized_client.post(f"/carts/pledges/{create_test_pledge_product.id}")
+    assert exact_res.status_code == 201
+
+    session.query(models.User).filter_by(id=user1_id).update({"money": 30.0})
+    session.commit()
+    over_res = authorized_client.post(f"/carts/pledges/{create_test_pledge_product.id}")
+
+    assert over_res.status_code == 409
+    assert session.query(models.Cart).filter_by(product_id=create_test_pledge_product.id).count() == 2
+    assert session.query(models.User).filter_by(id=user1_id).one().money == 30.0
+
+
+def test_create_cart_pledge_duplicate_is_separate_contribution(authorized_client, session, create_test_pledge_product, create_test_user1):
+    create_test_user1.money = 60.0
+    session.commit()
+
+    first_res = authorized_client.post(f"/carts/pledges/{create_test_pledge_product.id}")
+    second_res = authorized_client.post(f"/carts/pledges/{create_test_pledge_product.id}")
+
+    assert first_res.status_code == 201
+    assert second_res.status_code == 201
+    assert session.query(models.Cart).filter_by(product_id=create_test_pledge_product.id).count() == 2
+
+
+def test_get_my_pledge_purchase_hides_other_shares(authorized_client, session, create_test_pledge_product, create_test_user1):
+    create_test_user1.money = 30.0
+    session.commit()
+    res = authorized_client.post(f"/carts/pledges/{create_test_pledge_product.id}")
+    assert res.status_code == 201
+
+    res = authorized_client.get("/carts/me")
+
+    assert res.status_code == 200
+    assert res.json()[0]["product"]["pledge_shares"] == {create_test_user1.username: 30.0}
 
 
 # ==== GET MY PURCHASES ====

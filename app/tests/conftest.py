@@ -92,6 +92,16 @@ def create_test_user2(session):
 
 
 @pytest.fixture
+def create_test_user3(session):
+    new_user = models.User(username="ha12hu12_tester3", password="ha12hu12")
+    new_user.password = utils.hash_password(password=new_user.password)
+    session.add(new_user)
+    session.commit()
+    session.refresh(new_user)
+    return new_user
+
+
+@pytest.fixture
 def test_products(session, create_test_user1, create_test_user2):
     session.add_all([
         models.product(product_name="Wireless Mouse", description="Comfortable mouse", amount=25, price=50.0, owner_id=create_test_user1.id),
@@ -108,6 +118,25 @@ def create_test_product(session, create_test_user2):
         amount=5,
         price=50.0,
         owner_id=create_test_user2.id
+    )
+    session.add(new_product)
+    session.commit()
+    session.refresh(new_product)
+    return new_product
+
+
+@pytest.fixture
+def create_test_pledge_product(session, create_test_user2, create_test_user1, create_test_user3):
+    new_product = models.product(
+        product_name="Pledge Product",
+        description="A pledge product",
+        amount=1,
+        price=60.0,
+        pledge_shares={
+            create_test_user1.username: 30.0,
+            create_test_user3.username: 30.0,
+        },
+        owner_id=create_test_user2.id,
     )
     session.add(new_product)
     session.commit()

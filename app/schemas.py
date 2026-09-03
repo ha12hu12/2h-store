@@ -39,6 +39,7 @@ class ProductCreate(BaseModel):
     amount: int
     price: float
     image_url: Optional[str] = None
+    pledge_shares: Optional[dict] = None # {"hassan": 5, etc..}
 
 class ProductOut(BaseModel):
     id: int
@@ -47,6 +48,7 @@ class ProductOut(BaseModel):
     amount: int
     image_url: Optional[str] = None 
     price: float
+    pledge_shares: Optional[dict] = None # {"hassan": 5, etc..}
     owner: UserOut
     
 class MyProductOut(BaseModel):
@@ -63,6 +65,7 @@ class ProductUpdate(BaseModel):
     description: Optional[str] = None
     amount: Optional[int] = None
     price: Optional[float] = None 
+    pledge_shares: Optional[dict] = None
     image_url: Optional[str] = None  
 
 #--------cart schemas--------#

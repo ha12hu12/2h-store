@@ -1,5 +1,5 @@
 from .database import Base
-from sqlalchemy import Column, Integer, String, Boolean, VARCHAR, Float, TIMESTAMP, text, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean,JSON , VARCHAR, Float, TIMESTAMP, text, ForeignKey
 from sqlalchemy.orm import relationship
 
 class User(Base):
@@ -21,6 +21,7 @@ class product(Base):
     description = Column(VARCHAR(1000), server_default="No description")
     amount = Column(Integer, nullable=False)
     price = Column(Float, nullable=False)
+    pledge_shares = Column(JSON, nullable=True)  # {"hassan": 5, "hussein": 3, ...}
     image_url = Column(String, server_default=None)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, 
                         server_default=text("now()"))
@@ -41,8 +42,5 @@ class Cart(Base):
 
     buyer = relationship("User")
     product = relationship("product")
-    __table_args__ = (
-        UniqueConstraint('user_id', 'product_id', name='unique_user_product'),
-    )
 
 

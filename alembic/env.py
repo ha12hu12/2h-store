@@ -12,7 +12,7 @@ from app.config import settings
 import dotenv
 import os
 
-dotenv.load_dotenv()
+#dotenv.load_dotenv()
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
