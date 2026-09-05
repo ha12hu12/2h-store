@@ -34,7 +34,7 @@ def get_all_users(
 ):
     return db.query(models.User).all()
 
-@router.get("/users/me", response_model=schemas.UserOut)
+@router.get("/users/me", response_model=schemas.UserOutMe)
 def get_me(current_user = Depends(get_current_user)):
     return current_user
 

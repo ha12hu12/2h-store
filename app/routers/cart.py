@@ -37,7 +37,8 @@ def create_cart_product(id: int, db: session = Depends(get_db), current_user = D
 
                         
     #نقص the amount of the product
-    the_product.amount = the_product.amount - 1
+    if not the_product.pledge_shares:
+        the_product.amount -= 1
     # نقص the price of the product from the user cash
 
     new_cash = current_user.money - the_product.price
@@ -133,7 +134,11 @@ def get_unpaid_sells(username: str = None, db: session = Depends(get_db), curren
     if not products.all():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"you have no debts")
-    
+    #make the product pledge shares only the buyer pledge share
+    for item in products:
+         if item.product.pledge_shares:
+              item.product.pledge_shares = {item.buyer.username: item.product.pledge_shares[item.buyer.username]}
+    #check if he wants to search by username
     if username:
         products = products.filter(models.User.username.ilike(f"%{username}%"))
     return products

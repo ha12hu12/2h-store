@@ -10,9 +10,13 @@ class UserCreate(BaseModel):
 class UserOut(BaseModel):
     id: int
     username: str
-    money: float
     model_config = ConfigDict(from_attributes=True)
 
+class UserOutMe(BaseModel):
+    id: int
+    money: float
+    username: str
+    model_config = ConfigDict(from_attributes=True)
 class UserUpdateUsername(BaseModel):
     username:str
 
@@ -56,6 +60,7 @@ class MyProductOut(BaseModel):
     product_name: str
     description: Optional[str] = "there is no description"
     amount: int
+    pledge_shares: Optional[dict] = None
     price: float
     image_url: Optional[str] = None
 
