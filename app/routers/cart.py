@@ -121,7 +121,7 @@ def get_my_purchases(current_user=Depends(get_current_user), db=Depends(get_db))
 #or: getting_unpaid_sells
 @router.get("/carts/unpaid_sells", response_model=List[schemas.CartOutDebts])
 def get_unpaid_sells(username: str = None, db: session = Depends(get_db), current_user = Depends(get_current_user)):
-    products = db.query(models.Cart).join(
+    products_query = db.query(models.Cart).join(
     models.product, models.Cart.product_id == models.product.id
 ).join(
     models.User, models.Cart.user_id == models.User.id
@@ -129,18 +129,17 @@ def get_unpaid_sells(username: str = None, db: session = Depends(get_db), curren
     models.product.owner_id == current_user.id,
     models.Cart.status == False
 )
-    
+    products = products_query.all()
 
-    if not products.all():
+    if not products:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"you have no debts")
-    #make the product pledge shares only the buyer pledge share
-    for item in products:
-         if item.product.pledge_shares:
-              item.product.pledge_shares = {item.buyer.username: item.product.pledge_shares[item.buyer.username]}
+    
     #check if he wants to search by username
     if username:
         products = products.filter(models.User.username.ilike(f"%{username}%"))
+    #make the product pledge shares only the buyer pledge share
+
     return products
 
 

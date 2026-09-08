@@ -40,7 +40,7 @@ def get_products(db: session = Depends(get_db), current_user = Depends(get_curre
         if current_user.username in product.pledge_shares:
             product.pledge_shares = {current_user.username: product.pledge_shares[current_user.username]}
         else:
-            product.pledge_shares = None
+            product.pledge_shares = {"message": "you are no part of the pledge"}
     if not all_products:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="there is no products in the database")
     return all_products
@@ -69,6 +69,7 @@ def update_product(name: str, updated_product: schemas.ProductUpdate, db: sessio
     product_query = db.query(models.product).filter(models.product.product_name == name)
     the_product = product_query.first()
 
+
     if not the_product:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"No product found with id: {id}")
 
@@ -78,8 +79,24 @@ def update_product(name: str, updated_product: schemas.ProductUpdate, db: sessio
     if not the_product.pledge_shares:
         if updated_product.pledge_shares:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="this is not a pledge product")
-        
+
+    if updated_product.pledge_shares:
+        for person in the_product.pledge_shares.keys():
+            person_inDB= db.query(models.User).filter(models.User.username == person).first()
+
+            debts_query = db.query(models.Cart).join(
+                models.User, models.Cart.user_id == models.User.id
+            ).join(
+                models.product, models.Cart.product_id == models.product.id
+            ).filter(models.Cart.user_id ==person_inDB.id, 
+                     models.product.owner_id == current_user.id,
+                     models.product.id == the_product.id)
+
+            if debts_query.first():
+                updated_product.pledge_shares[person_inDB.username] = the_product.pledge_shares[person_inDB.username]
+            
     update_data = updated_product.model_dump(exclude_unset=True)
+    print(update_data)
     product_query.update(update_data, synchronize_session=False)
     db.commit()
     return {"message": "product updated successfully",
