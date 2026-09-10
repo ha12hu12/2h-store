@@ -137,7 +137,7 @@ def get_unpaid_sells(username: str = None, db: session = Depends(get_db), curren
     
     #check if he wants to search by username
     if username:
-        products = products.filter(models.User.username.ilike(f"%{username}%"))
+        products = products_query.filter(models.User.username.ilike(f"%{username}%"))
     #make the product pledge shares only the buyer pledge share
 
     return products

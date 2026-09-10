@@ -13,7 +13,7 @@ import app.utils as utils
 import app.models as models
 from app.oauth2 import get_current_user
 from typing import List
-
+from app.firebase import send_push_notification
 router = APIRouter(tags=["products"])
 
 #create product
@@ -24,6 +24,17 @@ def create_product(product_data: schemas.ProductCreate ,db: session = Depends(ge
     db.add(new_product)
     db.commit()
     db.refresh(new_product)
+    tokens = [
+    device_token.token
+    for device_token in db.query(models.DeviceToken).filter(
+        models.DeviceToken.token.isnot(None)
+    ).all()
+]
+    send_push_notification(
+        tokens=tokens,
+        title= "منتج جديد 📍",
+        body = "هناك منتج جديد تمت اضافته🎉 الحق قبل لا يخلص!"
+    )
     return new_product
 
 #get  products

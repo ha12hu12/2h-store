@@ -1,11 +1,11 @@
-from app.routers import user, auth, product, cart
+from app.routers import user, auth, product, cart, device_token
 
 from fastapi import  FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 twoH = FastAPI()
 
-origins = ["http://localhost:5173", "https://2h-store-frontend.vercel.app"]
+origins = ["http://localhost:5174","http://localhost:5173", "https://2h-store-frontend.vercel.app"]
 
 twoH.add_middleware(
     CORSMiddleware,
@@ -23,3 +23,4 @@ twoH.include_router(user.router)
 twoH.include_router(auth.router)
 twoH.include_router(product.router)
 twoH.include_router(cart.router)
+twoH.include_router(device_token.router)

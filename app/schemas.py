@@ -88,3 +88,7 @@ class CartOutDebts(BaseModel):
     buyer: UserOut
     product: ProductOut
     status: bool
+
+#device token for push notfications
+class DeviceTokenCreate(BaseModel):
+    token: str

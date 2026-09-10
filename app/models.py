@@ -43,4 +43,9 @@ class Cart(Base):
     buyer = relationship("User")
     product = relationship("product")
 
+class DeviceToken(Base):
+    __tablename__ = "device_tokens"
 
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
+    token = Column(String, unique=True, nullable=False)
