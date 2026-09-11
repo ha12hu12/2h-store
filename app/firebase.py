@@ -23,6 +23,9 @@ def send_push_notification(tokens: list[str], title: str, body: str):
             title=title,
             body=body,
         ),
+        data={
+        "url": "https://2h-store-frontend.vercel.app/"
+        },
         tokens=tokens,
     )
 
