@@ -27,7 +27,6 @@ twoH.include_router(cart.router)
 twoH.include_router(device_token.router)
 
 
-@twoH.get("/loaderio-0146f5ac8e18116efede814f9dffd1aa.txt", response_class=PlainTextResponse)
-@twoH.get("/loaderio-0146f5ac8e18116efede814f9dffd1aa/", response_class=PlainTextResponse)
-def loaderio_verify():
-    return "loaderio-0146f5ac8e18116efede814f9dffd1aa"
+@twoH.get("http://twoh-store.onrender.com/loaderio-6389923698787af9dfc4f5f1c3269d1b.txt", response_class=PlainTextResponse)
+def stuff_pls_work():
+    return "loaderio-6389923698787af9dfc4f5f1c3269d1b"
