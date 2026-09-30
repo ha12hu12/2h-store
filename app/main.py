@@ -2,6 +2,7 @@ from app.routers import user, auth, product, cart, device_token
 
 from fastapi import  FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import PlainTextResponse
 
 twoH = FastAPI()
 
@@ -24,3 +25,9 @@ twoH.include_router(auth.router)
 twoH.include_router(product.router)
 twoH.include_router(cart.router)
 twoH.include_router(device_token.router)
+
+
+@twoH.get("/loaderio-0146f5ac8e18116efede814f9dffd1aa.txt", response_class=PlainTextResponse)
+@twoH.get("/loaderio-0146f5ac8e18116efede814f9dffd1aa/", response_class=PlainTextResponse)
+def loaderio_verify():
+    return "loaderio-0146f5ac8e18116efede814f9dffd1aa"
