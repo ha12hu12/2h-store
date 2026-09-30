@@ -27,6 +27,10 @@ twoH.include_router(cart.router)
 twoH.include_router(device_token.router)
 
 
-@twoH.get("http://twoh-store.onrender.com/loaderio-6389923698787af9dfc4f5f1c3269d1b.txt", response_class=PlainTextResponse)
+from fastapi.responses import PlainTextResponse
+
+# استخدم اسم متغير تطبيق FastAPI الخاص بك (عادة app)
+@twoH.get("/loaderio-6389923698787af9dfc4f5f1c3269d1b.txt", response_class=PlainTextResponse)
+@twoH.get("/loaderio-6389923698787af9dfc4f5f1c3269d1b/", response_class=PlainTextResponse)
 def stuff_pls_work():
     return "loaderio-6389923698787af9dfc4f5f1c3269d1b"
